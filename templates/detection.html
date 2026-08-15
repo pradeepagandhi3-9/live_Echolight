@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection - Smart Vision Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(10, 20, 40, 1) 0%, rgba(2, 8, 23, 1) 100%);
+            min-height: 100vh;
+            color: #f1f5f9;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* animated grain / noise effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background: rgba(12, 22, 40, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 80px;
+            margin-bottom: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #a5c9ff, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #eef2ff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn:hover {
+            background: rgba(37, 99, 235, 0.85);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Main Detection Card */
+        .detection-card {
+            background: rgba(15, 25, 45, 0.55);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+
+        .detection-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .detection-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #a5c9ff, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 12px;
+        }
+
+        .detection-header p {
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        /* Control Buttons */
+        .control-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            text-decoration: none;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Instructions Section */
+        .instructions {
+            background: rgba(10, 20, 35, 0.6);
+            border-radius: 32px;
+            padding: 32px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .instructions h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #60a5fa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-step:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateX(5px);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .step-text {
+            flex: 1;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+
+        .step-text strong {
+            color: #60a5fa;
+        }
+
+        .key-hint {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin-left: 6px;
+        }
+
+        /* Caption Section */
+        .caption-section {
+            margin-top: 32px;
+        }
+
+        .caption-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .caption-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            padding: 8px 20px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 40px;
+            color: #60a5fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .caption-box {
+            background: rgba(10, 20, 35, 0.8);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            position: relative;
+            min-height: 150px;
+        }
+
+        .caption-box::before {
+            content: '"';
+            font-size: 4rem;
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            opacity: 0.2;
+            font-family: serif;
+            color: #60a5fa;
+        }
+
+        .caption-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding-left: 20px;
+        }
+
+        .caption-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: #9ca3af;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .caption-placeholder i {
+            font-size: 2rem;
+        }
+
+        /* Auto-refresh Toggle */
+        .auto-refresh {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 60px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .auto-refresh label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        .auto-refresh input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 40px;
+            font-size: 0.75rem;
+            color: #22c55e;
+            margin-left: 12px;
+        }
+
+        .status-indicator i {
+            font-size: 0.7rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 16px;
+                padding: 1rem;
+            }
+
+            .detection-card {
+                padding: 24px;
+            }
+
+            .detection-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .instructions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .caption-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .caption-box::before {
+                font-size: 2.5rem;
+                left: 12px;
+                top: 5px;
+            }
+
+            .caption-content {
+                padding-left: 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .control-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .refreshing {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .fa-spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- NAVBAR -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-eye"></i> Smart Vision Assistant
+            </div>
+
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('ocr') }}" class="nav-btn">
+                    <i class="fas fa-file-alt"></i> OCR
+                </a>
+                <a href="{{ url_for('about') }}" class="nav-btn">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+            </div>
+        </nav>
+
+        <!-- MAIN CARD -->
+        <div class="detection-card">
+
+            <div class="detection-header">
+                <h1><i class="fas fa-video"></i> Live Object Detection</h1>
+                <p>Real-time object recognition and AI-powered scene description</p>
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="control-buttons">
+
+                <button class="btn-primary" onclick="startDetection()">
+                    <i class="fas fa-play"></i> Start Camera Detection
+                </button>
+
+                <!-- FIXED (NO FLASK ROUTE ERROR) -->
+                <a href="#" class="btn-secondary" id="refreshLink">
+                    <i class="fas fa-sync-alt"></i> Refresh Description
+                </a>
+
+            </div>
+
+            <!-- INSTRUCTIONS -->
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> How to Use</h3>
+
+                <div class="instructions-grid">
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            Click <strong>Start Camera Detection</strong>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            Say <strong>"capture now"</strong> 🎤
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            Say <strong>"close"</strong> to exit
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">4</div>
+                        <div class="step-text">
+                            Click refresh to update description
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅ CAPTION SECTION (VERY IMPORTANT FIX) -->
+            <div class="caption-section">
+
+                <div class="caption-header">
+                    <div class="caption-title">
+                        <i class="fas fa-comment"></i> Scene Description
+                    </div>
+
+                    <span id="statusIndicator" class="status-indicator">
+                        <i class="fas fa-circle"></i> Live
+                    </span>
+                </div>
+
+                <div id="captionBox" class="caption-box">
+                    <div id="captionContent" class="caption-content">
+                        {{ latest_caption }}
+                    </div>
+                </div>
+
+                <div class="auto-refresh">
+                    <label>
+                        <input type="checkbox" id="autoRefreshToggle">
+                        Auto Refresh
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT -->
+    <script>
+        let autoRefreshInterval = null;
+
+        const autoRefreshToggle = document.getElementById('autoRefreshToggle');
+        const refreshLink = document.getElementById('refreshLink');
+        const captionContent = document.getElementById('captionContent');
+        const captionBox = document.getElementById('captionBox');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        function startDetection() {
+            fetch("/start_detection")
+                .then(res => res.text())
+                .then(() => showNotification("Camera started", "success"))
+                .catch(() => showNotification("Failed to start camera", "error"));
+        }
+
+        function refreshCaption() {
+            location.reload();
+        }
+
+        async function refreshCaptionAJAX() {
+            try {
+                const res = await fetch(window.location.href);
+                const html = await res.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newCaption = doc.getElementById('captionContent')?.innerHTML;
+
+                if (newCaption) {
+                    captionContent.innerHTML = newCaption;
+                }
+
+            } catch {
+                showNotification("Refresh failed", "error");
+            }
+        }
+
+        refreshLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            refreshCaptionAJAX();
+        });
+
+        autoRefreshToggle.addEventListener("change", (e) => {
+            if (e.target.checked) {
+                autoRefreshInterval = setInterval(refreshCaptionAJAX, 4000);
+            } else {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+
+        function showNotification(msg, type) {
+            const div = document.createElement("div");
+            div.innerText = msg;
+
+            div.style.position = "fixed";
+            div.style.bottom = "20px";
+            div.style.right = "20px";
+            div.style.padding = "10px 20px";
+            div.style.background = "#2563eb";
+            div.style.color = "#fff";
+            div.style.borderRadius = "20px";
+
+            document.body.appendChild(div);
+
+            setTimeout(() => div.remove(), 2500);
+        }
+    </script>
+</body>
+</html>

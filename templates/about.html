@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Smart Vision Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(10, 20, 40, 1) 0%, rgba(2, 8, 23, 1) 100%);
+            min-height: 100vh;
+            color: #f1f5f9;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* animated grain / noise effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background: rgba(12, 22, 40, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 80px;
+            margin-bottom: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #a5c9ff, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #eef2ff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn:hover {
+            background: rgba(37, 99, 235, 0.85);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Hero Section */
+        .about-hero {
+            text-align: center;
+            margin-bottom: 56px;
+            padding: 48px 32px;
+            border-radius: 48px;
+            background: linear-gradient(135deg, rgba(15, 35, 60, 0.7), rgba(5, 15, 35, 0.6));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .about-hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #a5c9ff, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .about-hero p {
+            font-size: 1.1rem;
+            color: #cbdffc;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 56px;
+        }
+
+        .mission-card {
+            background: rgba(12, 25, 45, 0.55);
+            backdrop-filter: blur(18px);
+            padding: 32px;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(20, 40, 65, 0.65);
+        }
+
+        .mission-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .mission-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .mission-card p {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        /* Features Grid */
+        .features-section {
+            margin-bottom: 56px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+        }
+
+        .feature-card {
+            background: rgba(12, 25, 45, 0.55);
+            backdrop-filter: blur(18px);
+            padding: 28px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(20, 40, 65, 0.65);
+        }
+
+        .feature-icon {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .feature-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        /* Technology Stack */
+        .tech-section {
+            margin-bottom: 56px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.05));
+            border-radius: 48px;
+            padding: 48px 32px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 28px;
+            margin-top: 32px;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .tech-item i {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            margin-bottom: 12px;
+        }
+
+        .tech-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .tech-item p {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        /* Team Section */
+        .team-section {
+            margin-bottom: 56px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 28px;
+            margin-top: 32px;
+        }
+
+        .team-card {
+            background: rgba(12, 25, 45, 0.55);
+            backdrop-filter: blur(18px);
+            padding: 28px;
+            border-radius: 28px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .team-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        .team-card .role {
+            color: #60a5fa;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .team-card p {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 28px;
+            margin-bottom: 56px;
+        }
+
+        .stat-card {
+            background: rgba(12, 25, 45, 0.55);
+            backdrop-filter: blur(18px);
+            padding: 32px;
+            border-radius: 28px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 48px 32px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(139, 92, 246, 0.1));
+            border-radius: 48px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 32px;
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .cta-section p {
+            color: #cbd5e1;
+            margin-bottom: 24px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 12px 32px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 24px 16px;
+            font-size: 0.85rem;
+            color: #9eb1d3;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 16px;
+                padding: 1rem;
+            }
+
+            .about-hero h1 {
+                font-size: 2rem;
+            }
+
+            .mission-section {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-eye"></i>
+                Smart Vision Assistant
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('register') }}" class="nav-btn">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+                <a href="{{ url_for('login') }}" class="nav-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <h1>About Smart Vision Assistant</h1>
+            <p>
+                We're on a mission to make the visual world accessible to everyone through the power of artificial intelligence. 
+                Our assistive technology helps visually impaired individuals understand their surroundings, read text, and navigate with confidence.
+            </p>
+        </div>
+
+        <!-- Mission Section -->
+        <div class="mission-section">
+            <div class="mission-card">
+                <div class="mission-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h2>Our Mission</h2>
+                <p>
+                    To break down visual barriers and create an inclusive world where everyone, regardless of visual ability, 
+                    can independently interact with their environment. We believe technology should empower, not limit.
+                </p>
+            </div>
+            <div class="mission-card">
+                <div class="mission-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h2>Our Vision</h2>
+                <p>
+                    A future where visual assistance is seamlessly integrated into daily life, making accessibility 
+                    universal and natural. We envision a world where no one is left behind in the digital age.
+                </p>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <h2 class="section-title">
+                <i class="fas fa-star"></i>
+                Core Features
+                <i class="fas fa-star"></i>
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>OCR Text Extraction</h3>
+                    <p>
+                        Extract printed text from images, documents, labels, and signs. Read books, menus, 
+                        and notices with high accuracy using Tesseract OCR technology.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Live Object Detection</h3>
+                    <p>
+                        Real-time object recognition using YOLOv8. Identify people, furniture, obstacles, 
+                        and everyday items to navigate safely and independently.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3>Scene Captioning</h3>
+                    <p>
+                        AI-powered image descriptions that provide rich context about the environment, 
+                        helping users understand complex visual scenes in natural language.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-microphone-alt"></i>
+                    </div>
+                    <h3>Voice Feedback</h3>
+                    <p>
+                        Hands-free operation with natural voice narration. Receive audio descriptions 
+                        of your surroundings and extracted text without needing to look at a screen.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Stack -->
+        <div class="tech-section">
+            <h2 class="section-title">
+                <i class="fas fa-microchip"></i>
+                Technology Stack
+            </h2>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <i class="fas fa-brain"></i>
+                    <h4>AI/ML Models</h4>
+                    <p>YOLOv8, Tesseract OCR, Transformers</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-python"></i>
+                    <h4>Backend</h4>
+                    <p>Flask, Python, OpenCV</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-cloud"></i>
+                    <h4>Frontend</h4>
+                    <p>HTML5, CSS3, JavaScript</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-database"></i>
+                    <h4>Database</h4>
+                    <p>SQLite, Session Management</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stat-card">
+                <div class="stat-number">1,200+</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">User Satisfaction</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">Images Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Accessibility Support</div>
+            </div>
+        </div>
+
+      
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>Ready to Experience the Future?</h2>
+            <p>Join thousands of users who are already benefiting from Smart Vision Assistant</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('register') }}" class="btn-primary">
+                    <i class="fas fa-user-plus"></i> Get Started Free
+                </a>
+                <a href="{{ url_for('ocr') }}" class="btn-secondary">
+                    <i class="fas fa-play"></i> Try Demo
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <i class="fas fa-universal-access"></i> Smart Vision Assistant • Empowering Accessibility Through AI
+            <div style="margin-top: 10px; font-size: 0.75rem;">© 2025 — Making the visual world accessible for everyone</div>
+        </div>
+    </div>
+
+    <script>
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Apply fade-in animation to all sections
+        const sections = document.querySelectorAll('.mission-card, .feature-card, .tech-item, .stat-card, .team-card');
+        sections.forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

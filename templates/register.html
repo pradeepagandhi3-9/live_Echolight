@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Smart Vision Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 10% 20%, rgba(10, 20, 40, 1) 0%, rgba(2, 8, 23, 1) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* animated grain / noise effect matching homepage */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Main container - glassmorphism card */
+        .register-container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(15, 25, 45, 0.55);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Top Navigation Bar */
+        .navbar {
+            background: rgba(12, 22, 40, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #a5c9ff, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+
+        .nav-btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #eef2ff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-btn:hover {
+            background: rgba(37, 99, 235, 0.85);
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Content Wrapper */
+        .content-wrapper {
+            display: flex;
+            min-height: 650px;
+        }
+
+        /* Left Section - Registration Form */
+        .form-section {
+            flex: 1.2;
+            padding: 2.5rem 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #1e293b;
+        }
+
+        .form-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .form-section::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 10px;
+        }
+
+        .form-section::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .form-container h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff, #cbd5e1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .form-subtitle {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .input-group label i {
+            margin-right: 6px;
+            color: #60a5fa;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 0.95rem;
+            background: rgba(10, 20, 35, 0.6);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(15, 30, 50, 0.8);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: #64748b;
+        }
+
+        .password-hint {
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: #94a3b8;
+            transition: color 0.3s ease;
+        }
+
+        .password-hint i {
+            margin-right: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .login-link a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+
+        .info-box {
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 12px;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.7rem;
+            color: #cbd5e1;
+        }
+
+        .info-box i {
+            margin-right: 6px;
+            color: #60a5fa;
+        }
+
+        .info-box span {
+            font-weight: 600;
+        }
+
+        .terms-note {
+            margin-top: 1rem;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        .terms-note a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .terms-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* Right Section - Illustration & Benefits */
+        .illustration-section {
+            flex: 0.8;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.05));
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            overflow-y: auto;
+        }
+
+        .illustration-content {
+            text-align: center;
+        }
+
+        .illustration-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .illustration-content h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .illustration-content p {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .benefit-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .benefit-card:hover {
+            background: rgba(59, 130, 246, 0.15);
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .benefit-card i {
+            font-size: 1.8rem;
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .benefit-card h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+        }
+
+        .benefit-card p {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        .stats-badge {
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .stats-badge i {
+            color: #60a5fa;
+        }
+
+        .stats-badge span {
+            font-size: 0.75rem;
+            color: #cbd5e1;
+        }
+
+        /* Flash Messages */
+        .flash-messages {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .flash-message {
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            animation: slideInRight 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flash-message.error {
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border-left: 3px solid #ef4444;
+        }
+
+        .flash-message.success {
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            border-left: 3px solid #22c55e;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .form-section {
+                padding: 2rem 1.5rem;
+                max-height: 550px;
+            }
+            
+            .illustration-section {
+                border-left: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+                padding: 2rem 1.5rem;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .navbar {
+                padding: 0.75rem 1.5rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-container h2 {
+                font-size: 1.8rem;
+            }
+            
+            .register-container {
+                border-radius: 32px;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .flash-messages {
+                left: 20px;
+                right: 20px;
+                top: 10px;
+            }
+            
+            .flash-message {
+                font-size: 0.75rem;
+                padding: 10px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <i class="fas {% if category == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Register Container -->
+    <div class="register-container">
+        <!-- Top Navigation Bar -->
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-eye"></i>
+                Smart Vision Assistant
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}" class="nav-btn">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('about') }}" class="nav-btn">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="{{ url_for('login') }}" class="nav-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+        </nav>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Left Side - Registration Form -->
+            <div class="form-section">
+                <div class="form-container">
+                    <h2>Join the Vision</h2>
+                    <p class="form-subtitle">Create your account and unlock accessibility tools</p>
+                    
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <div class="input-group">
+                            <label><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" name="name" placeholder="John Doe" required autocomplete="name">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-envelope"></i> Email Address</label>
+                            <input type="email" name="email" placeholder="hello@smartvision.com" required autocomplete="email">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" name="phone" placeholder="+1 234 567 8900" required autocomplete="tel">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label><i class="fas fa-lock"></i> Password</label>
+                            <input type="password" name="password" id="password" placeholder="Create a strong password" required autocomplete="new-password">
+                            <div class="password-hint" id="passwordHint">
+                                <i class="fas fa-shield-alt"></i> Use at least 8 characters with letters and numbers
+                            </div>
+                        </div>
+                        
+                        <button type="submit">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </form>
+                    
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+                    
+                    <div class="login-link">
+                        Already have an account? <a href="{{ url_for('login') }}">Sign in here</a>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="fas fa-gem"></i>
+                        <span>Free account benefits:</span> 10 OCR scans daily • Object detection • Voice feedback • Save history
+                    </div>
+
+                    <div class="terms-note">
+                        By registering, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Side - Illustration & Benefits -->
+            <div class="illustration-section">
+                <div class="illustration-content">
+                    <div class="illustration-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>Start Your Journey</h3>
+                    <p>Join thousands of users who experience the world differently with AI-powered visual assistance</p>
+                    
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <i class="fas fa-file-alt"></i>
+                            <h4>OCR Extraction</h4>
+                            <p>Read text from images</p>
+                        </div>
+                        <div class="benefit-card">
+                            <i class="fas fa-video"></i>
+                            <h4>Object Detection</h4>
+                            <p>Real-time recognition</p>
+                        </div>
+                        <div class="benefit-card">
+                            <i class="fas fa-image"></i>
+                            <h4>Scene Captioning</h4>
+                            <p>AI descriptions</p>
+                        </div>
+                        <div class="benefit-card">
+                            <i class="fas fa-microphone-alt"></i>
+                            <h4>Voice Feedback</h4>
+                            <p>Hands-free operation</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-badge">
+                        <i class="fas fa-users"></i>
+                        <span>1,200+ active users</span>
+                        <i class="fas fa-chart-line"></i>
+                        <span>98% satisfaction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-hide flash messages after 4 seconds
+        setTimeout(function() {
+            const flashes = document.querySelectorAll('.flash-message');
+            flashes.forEach(flash => {
+                flash.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                flash.style.opacity = '0';
+                flash.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if(flash.parentNode) flash.remove();
+                }, 300);
+            });
+        }, 4000);
+
+        // Password strength indicator with real-time feedback
+        const passwordInput = document.getElementById('password');
+        const passwordHint = document.getElementById('passwordHint');
+        
+        if(passwordInput && passwordHint) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                const hasLength = password.length >= 8;
+                const hasLetters = /[a-zA-Z]/.test(password);
+                const hasNumbers = /[0-9]/.test(password);
+                const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+                
+                if(password.length === 0) {
+                    passwordHint.innerHTML = '<i class="fas fa-shield-alt"></i> Use at least 8 characters with letters and numbers';
+                    passwordHint.style.color = '#94a3b8';
+                } else if(hasLength && hasLetters && hasNumbers && hasSpecial) {
+                    passwordHint.innerHTML = '<i class="fas fa-check-circle"></i> Strong password! Great security!';
+                    passwordHint.style.color = '#22c55e';
+                } else if(hasLength && hasLetters && hasNumbers) {
+                    passwordHint.innerHTML = '<i class="fas fa-check"></i> Good password! Add special characters for extra security';
+                    passwordHint.style.color = '#60a5fa';
+                } else if(hasLength && (hasLetters || hasNumbers)) {
+                    passwordHint.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Medium strength - mix letters and numbers';
+                    passwordHint.style.color = '#f59e0b';
+                } else if(password.length > 0) {
+                    passwordHint.innerHTML = '<i class="fas fa-exclamation-circle"></i> Weak password - use at least 8 characters with letters and numbers';
+                    passwordHint.style.color = '#ef4444';
+                }
+            });
+        }
+
+        // Ripple effect for button
+        const btn = document.querySelector('button[type="submit"]');
+        if(btn) {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.backgroundColor = 'rgba(255,255,255,0.6)';
+                ripple.style.width = '30px';
+                ripple.style.height = '30px';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.pointerEvents = 'none';
+                const rect = btn.getBoundingClientRect();
+                ripple.style.left = (e.clientX - rect.left - 15) + 'px';
+                ripple.style.top = (e.clientY - rect.top - 15) + 'px';
+                btn.style.position = 'relative';
+                btn.style.overflow = 'hidden';
+                btn.appendChild(ripple);
+                
+                const animation = ripple.animate([
+                    { transform: 'scale(0)', opacity: 0.6 },
+                    { transform: 'scale(20)', opacity: 0 }
+                ], {
+                    duration: 500,
+                    easing: 'ease-out'
+                });
+                
+                animation.onfinish = () => ripple.remove();
+                setTimeout(() => {
+                    btn.style.overflow = '';
+                }, 500);
+            });
+        }
+
+        // Input focus effects
+        const inputs = document.querySelectorAll('.input-group input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateX(4px)';
+                this.parentElement.style.transition = 'transform 0.2s ease';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Floating label color change on focus
+        const inputGroups = document.querySelectorAll('.input-group');
+        inputGroups.forEach(group => {
+            const input = group.querySelector('input');
+            const label = group.querySelector('label');
+            if(input && label) {
+                input.addEventListener('focus', () => {
+                    label.style.color = '#60a5fa';
+                });
+                input.addEventListener('blur', () => {
+                    label.style.color = '#e2e8f0';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

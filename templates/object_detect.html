@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection - AI Vision Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* subtle background pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Main wrapper - unified card style */
+        .main-wrapper {
+            max-width: 900px;
+            margin: 10px auto 30px;
+            background: #ffffff;
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+            border: 1px solid #eef2f8;
+        }
+
+        /* Top Navigation Bar - Integrated as part of the card */
+        .navbar {
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid #eef2f8;
+            padding: 0.9rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            background: linear-gradient(125deg, #0f2b3d 0%, #1e4a6e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logo::before {
+            content: "👁️";
+            font-size: 1.4rem;
+            background: none;
+            -webkit-text-fill-color: initial;
+            color: #1e4a6e;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .nav-btn.back {
+            color: #1e4a6e;
+            background: transparent;
+            border: 1.5px solid #cbd5e1;
+        }
+
+        .nav-btn.back:hover {
+            background: #f1f5f9;
+            border-color: #1e4a6e;
+            transform: translateY(-1px);
+        }
+
+        /* Content Container */
+        .content-container {
+            padding: 2rem;
+        }
+
+        /* Icon Header */
+        .detection-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        /* Title */
+        .title {
+            font-size: 1.8rem;
+            color: #0f2b3d;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        /* Description */
+        .description {
+            color: #5b6e8c;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Camera Container */
+        .camera-container {
+            background: #000;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #camera {
+            width: 100%;
+            border-radius: 1rem;
+            display: block;
+        }
+
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .start-btn {
+            background: #0f2b3d;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .start-btn:hover {
+            background: #1e4a6e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 43, 61, 0.25);
+        }
+
+        .start-btn.secondary {
+            background: #e2e8f0;
+            color: #1e4a6e;
+        }
+
+        .start-btn.secondary:hover {
+            background: #cbd5e1;
+            transform: translateY(-2px);
+        }
+
+        /* Result Box */
+        .result-box {
+            background: #fafcff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #eef2f8;
+            min-height: 80px;
+        }
+
+        .result-box h3 {
+            color: #0f2b3d;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .result-text {
+            color: #2d3e5f;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* Keyboard Shortcuts Box */
+        .shortcuts-box {
+            background: #fafcff;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #eef2f8;
+        }
+
+        .shortcuts-box h4 {
+            color: #0f2b3d;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .shortcut-key {
+            background: #0f2b3d;
+            color: white;
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            min-width: 40px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .shortcut-desc {
+            color: #5b6e8c;
+            font-size: 0.8rem;
+        }
+
+        /* Back Link */
+        .back-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #5b6e8c;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+            text-align: center;
+        }
+
+        .back-link:hover {
+            color: #1e4a6e;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid #eef2f8;
+            background: #fafcff;
+        }
+
+        .footer p {
+            color: #94a3b8;
+            font-size: 0.7rem;
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                margin: 10px 15px 20px;
+                border-radius: 1.5rem;
+            }
+            
+            .navbar {
+                padding: 0.7rem 1.2rem;
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .nav-links {
+                gap: 0.8rem;
+            }
+            
+            .nav-btn {
+                padding: 0.4rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .content-container {
+                padding: 1.2rem;
+            }
+            
+            .title {
+                font-size: 1.4rem;
+            }
+            
+            .detection-icon {
+                font-size: 2.5rem;
+            }
+            
+            .button-group {
+                gap: 0.8rem;
+            }
+            
+            .start-btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .shortcut-item {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Wrapper: Unified card with navbar integrated at top -->
+    <div class="main-wrapper">
+        <!-- Top Navigation Bar - Integrated as part of the card -->
+        <nav class="navbar">
+            <div class="logo">AI Vision Assistant</div>
+            <div class="nav-links">
+                <a href="/" class="nav-btn back">⬅ Back</a>
+            </div>
+        </nav>
+
+        <!-- Content Container -->
+        <div class="content-container">
+            <div class="detection-icon">🎥</div>
+            <h1 class="title">Object Detection</h1>
+            <p class="description">Real-time object detection powered by YOLOv8</p>
+
+            <!-- Camera Video -->
+            <div class="camera-container">
+                <video id="camera" autoplay style="width:100%; border-radius:12px;"></video>
+            </div>
+
+            <!-- Button Group -->
+            <div class="button-group">
+                <button onclick="startCamera()" class="start-btn">📷 Open Camera</button>
+                <button onclick="captureImage()" class="start-btn">📸 Capture</button>
+            </div>
+
+            <!-- Result Display -->
+            <div class="result-box">
+                <h3>🔍 Detection Result</h3>
+                <div id="result" class="result-text">Click 'Capture' to detect objects and generate scene description</div>
+            </div>
+
+            <!-- Keyboard Shortcuts -->
+            <div class="shortcuts-box">
+                <h4>⌨️ Keyboard Shortcuts</h4>
+                <div class="shortcut-item">
+                    <span class="shortcut-key">c</span>
+                    <span class="shortcut-desc">Capture & speak description</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="shortcut-key">q</span>
+                    <span class="shortcut-desc">Exit camera (stop video stream)</span>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="/" class="back-link">⬅ Back to Home</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Press 'c' to capture, 'q' to stop camera • AI-powered object detection + image captioning</p>
+        </div>
+    </div>
+
+    <script>
+        let video = document.getElementById("camera");
+        let currentStream = null;
+
+        function startCamera() {
+            if (currentStream) {
+                // Stop existing stream first
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    currentStream = stream;
+                    video.srcObject = stream;
+                    updateResult("✅ Camera is active. Click 'Capture' to detect objects.");
+                })
+                .catch(err => {
+                    console.error("Camera error:", err);
+                    updateResult("❌ Unable to access camera. Please check permissions.");
+                });
+        }
+
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+                video.srcObject = null;
+                updateResult("📷 Camera stopped. Click 'Open Camera' to restart.");
+            }
+        }
+
+        function captureImage() {
+            if (!video.videoWidth || !video.videoHeight) {
+                updateResult("⚠️ Please open the camera first before capturing.");
+                return;
+            }
+
+            let canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0);
+
+            let image = canvas.toDataURL("image/jpeg");
+
+            updateResult("🔄 Processing image...");
+
+            fetch("/process_image", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ image: image })
+            })
+            .then(res => res.json())
+            .then(data => {
+                let objectsText = data.objects && data.objects.length > 0 
+                    ? data.objects.join(", ") 
+                    : "No objects detected";
+                
+                let captionText = data.caption || "No caption generated";
+                
+                let text = "🔍 Objects: " + objectsText + " | 📝 Scene: " + captionText;
+                
+                document.getElementById("result").innerText = text;
+                
+                // Voice output
+                let speech = new SpeechSynthesisUtterance(text);
+                speech.rate = 0.9;
+                speech.pitch = 1.0;
+                speechSynthesis.speak(speech);
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                updateResult("❌ Error processing image. Please try again.");
+            });
+        }
+
+        function updateResult(message) {
+            document.getElementById("result").innerText = message;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener("keydown", function(event) {
+            if (event.key === 'c' || event.key === 'C') {
+                event.preventDefault();
+                captureImage();
+            } else if (event.key === 'q' || event.key === 'Q') {
+                event.preventDefault();
+                stopCamera();
+            }
+        });
+
+        // Auto-start camera when page loads
+        startCamera();
+
+        // Clean up on page unload
+        window.addEventListener("beforeunload", function() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
